@@ -1,0 +1,175 @@
+openapi: 3.1.0
+info:
+  title: Finance Tracker API
+  description: API de controle de gastos pessoais (receitas e despesas).
+  version: "1.0.0"
+servers:
+  - url: http://localhost:3000
+paths:
+  /transactions/summary:
+    get:
+      summary: Retorna o resumo financeiro (saldo total e totais por categoria)
+      description: >
+        Endpoint principal da API. Agrega todas as transações que casam com os filtros
+        informados e retorna total de receitas, total de despesas, saldo e totais por categoria.
+      parameters:
+        - $ref: "#/components/parameters/type"
+        - $ref: "#/components/parameters/category"
+        - $ref: "#/components/parameters/from"
+        - $ref: "#/components/parameters/to"
+      responses:
+        "200":
+          description: Resumo calculado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Summary"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+  /transactions:
+    post:
+      summary: Cria uma nova transação (receita ou despesa)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewTransaction"
+      responses:
+        "201":
+          description: Transação criada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+    get:
+      summary: Lista transações
+      parameters:
+        - $ref: "#/components/parameters/type"
+        - $ref: "#/components/parameters/category"
+        - $ref: "#/components/parameters/from"
+        - $ref: "#/components/parameters/to"
+      responses:
+        "200":
+          description: Lista de transações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+  /transactions/{id}:
+    delete:
+      summary: Remove uma transação
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Removida com sucesso
+        "404":
+          description: Transação não encontrada
+  /health:
+    get:
+      summary: Liveness check
+      responses:
+        "200":
+          description: API no ar
+  /metrics:
+    get:
+      summary: Métricas no formato Prometheus
+      responses:
+        "200":
+          description: Métricas expostas (text/plain, formato Prometheus)
+components:
+  parameters:
+    type:
+      name: type
+      in: query
+      schema:
+        type: string
+        enum: [income, expense]
+    category:
+      name: category
+      in: query
+      schema:
+        type: string
+    from:
+      name: from
+      in: query
+      schema:
+        type: string
+        format: date
+    to:
+      name: to
+      in: query
+      schema:
+        type: string
+        format: date
+  responses:
+    ValidationError:
+      description: Payload ou query inválidos
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              details:
+                type: object
+  schemas:
+    NewTransaction:
+      type: object
+      required: [description, amount, type, category, date]
+      properties:
+        description:
+          type: string
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+        type:
+          type: string
+          enum: [income, expense]
+        category:
+          type: string
+        date:
+          type: string
+          format: date
+    Transaction:
+      allOf:
+        - $ref: "#/components/schemas/NewTransaction"
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+    CategoryTotals:
+      type: object
+      properties:
+        income:
+          type: number
+        expense:
+          type: number
+        balance:
+          type: number
+    Summary:
+      type: object
+      properties:
+        totalIncome:
+          type: number
+        totalExpense:
+          type: number
+        balance:
+          type: number
+        byCategory:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/CategoryTotals"
