@@ -15,7 +15,7 @@ export const options = {
   },
 };
 
-export default function (): void {
+export default function () {
   const res = http.get(`${BASE_URL}/transactions/summary`);
 
   check(res, {
