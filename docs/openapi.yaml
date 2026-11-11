@@ -3,11 +3,20 @@ info:
   title: Finance Tracker API
   description: API de controle de gastos pessoais (receitas e despesas).
   version: "1.0.0"
+  contact:
+    name: Diego Peixoto
 servers:
   - url: http://localhost:3000
+tags:
+  - name: transactions
+    description: Operações sobre transações financeiras
+  - name: observability
+    description: Liveness e métricas
 paths:
   /transactions/summary:
     get:
+      operationId: getTransactionsSummary
+      tags: [transactions]
       summary: Retorna o resumo financeiro (saldo total e totais por categoria)
       description: >
         Endpoint principal da API. Agrega todas as transações que casam com os filtros
@@ -28,7 +37,10 @@ paths:
           $ref: "#/components/responses/ValidationError"
   /transactions:
     post:
+      operationId: createTransaction
+      tags: [transactions]
       summary: Cria uma nova transação (receita ou despesa)
+      description: Cria uma transação de receita ou despesa associada a uma categoria e data.
       requestBody:
         required: true
         content:
@@ -45,7 +57,10 @@ paths:
         "400":
           $ref: "#/components/responses/ValidationError"
     get:
+      operationId: listTransactions
+      tags: [transactions]
       summary: Lista transações
+      description: Lista transações com filtros opcionais por tipo, categoria e período.
       parameters:
         - $ref: "#/components/parameters/type"
         - $ref: "#/components/parameters/category"
@@ -62,7 +77,10 @@ paths:
                   $ref: "#/components/schemas/Transaction"
   /transactions/{id}:
     delete:
+      operationId: deleteTransaction
+      tags: [transactions]
       summary: Remove uma transação
+      description: Remove permanentemente uma transação pelo seu id.
       parameters:
         - name: id
           in: path
@@ -77,13 +95,19 @@ paths:
           description: Transação não encontrada
   /health:
     get:
+      operationId: getHealth
+      tags: [observability]
       summary: Liveness check
+      description: Indica se a API está no ar.
       responses:
         "200":
           description: API no ar
   /metrics:
     get:
+      operationId: getMetrics
+      tags: [observability]
       summary: Métricas no formato Prometheus
+      description: Expõe as métricas da API no formato de texto do Prometheus.
       responses:
         "200":
           description: Métricas expostas (text/plain, formato Prometheus)
