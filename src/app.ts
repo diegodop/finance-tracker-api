@@ -1,5 +1,5 @@
 import express, { type Express } from "express";
-import pinoHttp from "pino-http";
+import { pinoHttp } from "pino-http";
 import type { PrismaClient } from "@prisma/client";
 import { createTransactionsRouter } from "./http/routes/transactions.js";
 import { errorHandler } from "./http/middlewares/error-handler.js";
