@@ -5,6 +5,10 @@
 API de controle de gastos pessoais (receitas e despesas): registrar transações e consultar um
 resumo financeiro (saldo total e totais por categoria). Trabalho individual.
 
+O foco é um único domínio com um fluxo completo e bem testado, como pede o Nível B. Autenticação/
+multiusuário real, orçamentos/metas, recorrência, múltiplas moedas e frontend não fazem parte
+deste projeto — ficam fora do escopo por decisão explícita.
+
 ## Stack
 
 Node.js 22 + TypeScript, Express, Prisma + PostgreSQL (Repository Pattern), Zod, pino (logs
@@ -73,9 +77,3 @@ SLO declarado, resultado medido e diagnóstico de gargalo em [`docs/desempenho.m
 - [Desempenho (SLO, k6, gargalo)](docs/desempenho.md)
 - [Uso de IA](docs/ia.md)
 - [Contribuidores](CONTRIBUTORS.md)
-
-## Escopo (fora do escopo, por decisão explícita)
-
-Autenticação/multiusuário real, orçamentos/metas, recorrência, múltiplas moedas e frontend não
-fazem parte deste projeto — o foco é um único domínio com um fluxo completo e bem testado, como
-pede o Nível B.
